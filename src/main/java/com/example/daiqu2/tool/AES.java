@@ -66,7 +66,6 @@ public class AES {
     public static void main(String[] args){
         String testCode ="周牛逼";
         System.out.println(testCode);
-
         String miwen = encrypt(testCode);
         System.out.println(miwen);
         String yuanwen = decrypt(miwen);

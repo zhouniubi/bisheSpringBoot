@@ -58,19 +58,19 @@ public class userServiceImp implements userService {
     public String loginUser(userData user){
         try {
             if (!userExit(user)) {
-                System.out.println("用户不存在");
+                //System.out.println("用户不存在");
                 return "000";
             }
             userTable uTable = uRepository.findByPhoneAndPwd(user.getPhone(),user.getPwd());
             if (uTable == null) {
-                System.out.println("密码错误");
+               // System.out.println("密码错误");
                 return "110";
             } else {
-                System.out.println("登陆成功");
+                //System.out.println("登陆成功");
                 return "111";
             }
         }catch (Exception e){
-            System.out.println("其他错误");
+            //System.out.println("其他错误");
             return "101";
         }
     }
@@ -85,30 +85,22 @@ public class userServiceImp implements userService {
     public String mibaoExit(mibaoData mbData) {
         userData uData = new userData();
         uData.setPhone( mbData.getPhone());
-        System.out.println(mbData.getPhone());
         if(!userExit(uData)){
-            System.out.println("不存在用户！");
             return "000";
         }else{
             mibaoTable mbTable = mbRepository.findByPhone(mbData.getPhone());
             String mibao1 = mbTable.getMibao1();
             String mibao2 = mbTable.getMibao2();
-            //System.out.println("mibao1:"+mibao1);
-            //System.out.println("mibao2:"+mibao2);
             if(mibao1==null||mibao1.length()==0){
                 if(mibao2==null||mibao2.length()==0){
-                    //System.out.println("不存在密保！");
                     return "200";
                 }else{
-                    //System.out.println("不存在密保1！");
                     return "202";
                 }
             }else{
                 if(mibao2==null||mibao2.length()==0){
-                    //System.out.println("不存在密保2！");
                     return "220";
                 }else{
-                    //System.out.println("存在密保！");
                     return "222";
                 }
             }
@@ -153,7 +145,7 @@ public class userServiceImp implements userService {
         String newPwd = mbData.getPwd();
         mibaoTable mbTable = mbRepository.findByPhone(phone);
         if(mbData.getAnswer1().equals(mbTable.getAnswer1())
-                ||mbData.getAnswer2().equals(mbData.getAnswer2())){
+                ||mbData.getAnswer2().equals(mbTable.getAnswer2())){
             try{
                 uRepository.updatePwdByPhone(phone,newPwd);
             }catch (Exception e){

@@ -21,16 +21,19 @@ public class UserController {
     @RequestMapping("/insert")
     @ResponseBody
     public String insetUserData(){
-        String phone = "13955005387",introduce = "",name = "周周",pwd = "123456";
+        String phone = "13955005388",introduce = "",name = "周周",pwd = "123456";
+        String phone2 = "13955005386";
         int identity = 11, sex = 0;
         userData uData = new userData();
-        uData.setPhone(AES.encrypt(phone));
+        uData.setPhone(AES.encrypt(phone2));
         uData.setIdentity(identity);
         uData.setIntroduce(AES.encrypt(introduce));
         uData.setName(AES.encrypt(name));
         uData.setPwd(AES.encrypt(pwd));
         uData.setSex(sex);
+        String name3 = AES.decrypt(uData.getName());
         if(uService.insertUser(uData)==1) {
+            System.out.println(name3);
             return "插入成功";
         }
         else if(uService.insertUser(uData)==0){
@@ -109,13 +112,13 @@ public class UserController {
     @RequestMapping("/insertMibao")
     @ResponseBody//@RequestBody mibaoData mbData
     public String insetMibaoData(){
-        String phone = "13955005387",mibao1="崩三我最喜欢的角色",mibao2="我大学的宿舍是多少"
+        String phone = "13955005386",mibao1="崩三我最喜欢的角色",mibao2="我大学的宿舍是多少"
                 ,answer1="德莉莎",answer2="617";
         mibaoData mb = new mibaoData();
         mb.setPhone(AES.encrypt(phone));
-        //mb.setMibao1(AES.encrypt(mibao1));
+        mb.setMibao1(AES.encrypt(mibao1));
         mb.setMibao2(AES.encrypt(mibao2));
-        //mb.setAnswer1(AES.encrypt(answer1));
+        mb.setAnswer1(AES.encrypt(answer1));
         mb.setAnswer2(AES.encrypt(answer2));
         if(uService.insertMibao(mb).equals("1")) {
             return "1";
@@ -125,7 +128,6 @@ public class UserController {
     @RequestMapping("/updateForgetPwd")
     @ResponseBody
     public String updateForgetPwd(@RequestBody mibaoData mbData){
-
         return uService.updateForgetPwd(mbData);
     }
 
