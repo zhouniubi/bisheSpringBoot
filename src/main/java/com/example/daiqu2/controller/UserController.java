@@ -18,28 +18,19 @@ import java.util.List;
 public class UserController {
     @Autowired
     userService uService ;
-    @RequestMapping("/insert")
+    @RequestMapping("/login")
     @ResponseBody
-    public String insetUserData(){
-        String phone = "13955005388",introduce = "",name = "周周",pwd = "123456";
-        String phone2 = "13955005386";
-        int identity = 11, sex = 0;
-        userData uData = new userData();
-        uData.setPhone(AES.encrypt(phone2));
-        uData.setIdentity(identity);
-        uData.setIntroduce(AES.encrypt(introduce));
-        uData.setName(AES.encrypt(name));
-        uData.setPwd(AES.encrypt(pwd));
-        uData.setSex(sex);
-        String name3 = AES.decrypt(uData.getName());
+    public String insetUserData(@RequestBody userData uData){
         if(uService.insertUser(uData)==1) {
-            System.out.println(name3);
-            return "插入成功";
+            System.out.print("插入成功！");
+            return "11";
         }
         else if(uService.insertUser(uData)==0){
-            return "账户已经存在";
+            System.out.print("用户已经存在！");
+            return "10";
         }
-            return "未知错误";
+        System.out.print("其他错误！");
+            return "00";
     }
     @RequestMapping("/delete")
     @ResponseBody
@@ -52,9 +43,9 @@ public class UserController {
         }else
             return "删除失败";
     }
-    @RequestMapping("/login")
+    @RequestMapping("/load")
     @ResponseBody
-    public String login(@RequestBody userData uData){
+    public String load(@RequestBody userData uData){
         switch(uService.loginUser(uData)){
             case "111":
                 return "111";//"登录成功"

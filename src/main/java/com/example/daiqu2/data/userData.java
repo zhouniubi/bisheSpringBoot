@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class userData {
     private int id;
-    private int identity;
-    private int sex;
+    private String identity;
+    private String sex;
     private String phone;
     private String introduce;
     private String name;

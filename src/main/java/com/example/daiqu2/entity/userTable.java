@@ -17,9 +17,9 @@ public class userTable {
     @Column(name = "pwd",nullable = false)
     private String pwd;
     @Column(name = "sex",nullable = false)
-    private int sex;
+    private String sex;
     @Column(name = "identity",nullable = false)
-    private int identity;
+    private String identity;
     @Column(name = "introduce")
     private String introduce;
 
