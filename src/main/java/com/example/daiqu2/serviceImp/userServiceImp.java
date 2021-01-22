@@ -19,11 +19,12 @@ public class userServiceImp implements userService {
     userRepository uRepository;
     @Autowired
     mibaoRepository mbRepository;
+
     //插入新的用户数据（注册使用）
     @Override
     public int insertUser(userData user) {
         userTable uTable = new userTable();
-        if(userExit(user)){
+        if (userExit(user)) {
             return 0;
         }
         uTable.setIdentity(user.getIdentity());
@@ -35,72 +36,77 @@ public class userServiceImp implements userService {
         uRepository.save(uTable);
         return 1;
     }
+
     //判断用户是否已经存在
     @Override
     public boolean userExit(userData user) {
         userTable uTable = uRepository.findByPhone(user.getPhone());
 
-        if(uTable==null){
+        if (uTable == null) {
             return false;
         }
         return true;
     }
+
     //删除用户数据
-    public boolean deleteUser(userData user){
-        if(!userExit(user)){
+    public boolean deleteUser(userData user) {
+        if (!userExit(user)) {
             System.out.println("用户不存在");
             return false;
         }
         uRepository.deleteByPhone(user.getPhone());
         return true;
     }
+
     //用户登录（4种状态：登录成功111，密码错误110，用户不存在000，其他报错101）
-    public String loginUser(userData user){
+    public String loginUser(userData user) {
         try {
             if (!userExit(user)) {
                 //System.out.println("用户不存在");
                 return "000";
             }
-            userTable uTable = uRepository.findByPhoneAndPwd(user.getPhone(),user.getPwd());
+            userTable uTable = uRepository.findByPhoneAndPwd(user.getPhone(), user.getPwd());
             if (uTable == null) {
-               // System.out.println("密码错误");
+                // System.out.println("密码错误");
                 return "110";
             } else {
                 //System.out.println("登陆成功");
                 return "111";
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             //System.out.println("其他错误");
             return "101";
         }
     }
+
     //显示解密后的信息
-    public userTable viewData(userData uData){
+    public userTable viewData(userData uData) {
         userTable uTable = uRepository.findByPhoneAndPwd(AES.encrypt(uData.getPhone())
-                ,AES.encrypt(uData.getPwd()));
+                , AES.encrypt(uData.getPwd()));
         return uTable;
     }
+
     //判断密保是否存在，用户不存在返回000.没有密保返回200，有密保1没有密保2返回220，有密保2没有密保1返回202，存在密保返回222
     @Override
     public String mibaoExit(mibaoData mbData) {
         userData uData = new userData();
-        uData.setPhone( mbData.getPhone());
-        if(!userExit(uData)){
+        uData.setPhone(mbData.getPhone());
+        if (!userExit(uData)) {
             return "000";
-        }else{
+        } else {
             mibaoTable mbTable = mbRepository.findByPhone(mbData.getPhone());
             String mibao1 = mbTable.getMibao1();
             String mibao2 = mbTable.getMibao2();
-            if(mibao1==null||mibao1.length()==0){
-                if(mibao2==null||mibao2.length()==0){
+            if (mibao1 == null || mibao1.length() == 0) {
+                if (mibao2 == null || mibao2.length() == 0) {
                     return "200";
-                }else{
+                } else {
                     return "202";
                 }
-            }else{
-                if(mibao2==null||mibao2.length()==0){
+            } else {
+                if (mibao2 == null || mibao2.length() == 0) {
                     return "220";
-                }else{
+                } else {
                     return "222";
                 }
             }
@@ -119,7 +125,7 @@ public class userServiceImp implements userService {
             mbTable.setAnswer2(mbData.getAnswer2());
             mbRepository.save(mbTable);
             return "1";
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return "0";
@@ -130,30 +136,46 @@ public class userServiceImp implements userService {
         String state = mibaoExit(mbData);
         String phone = mbData.getPhone();
         mibaoTable mbTable = mbRepository.findByPhone(phone);
-        if(state.equals("220")){
+        if (state.equals("220")) {
             return mbTable.getMibao1();
-        }else if(state.equals("202")){
+        } else if (state.equals("202")) {
             return mbTable.getMibao2();
-        }else{
-            return mbTable.getMibao1()+"/"+mbTable.getMibao2();
+        } else {
+            return mbTable.getMibao1() + "/" + mbTable.getMibao2();
         }
     }
-    //返回fg_e说明更新操作出问题（数据库部分），fg_1说明更新成功，fg_0说明密保答案错误。
+
+    //返回fg_e说明更新操作出问题（数据库部分），fg_1说明更新成功，fg_0说明密保答案错误。(存在密保)
     @Override
     public String updateForgetPwd(mibaoData mbData) {
         String phone = mbData.getPhone();
         String newPwd = mbData.getPwd();
         mibaoTable mbTable = mbRepository.findByPhone(phone);
-        if(mbData.getAnswer1().equals(mbTable.getAnswer1())
-                ||mbData.getAnswer2().equals(mbTable.getAnswer2())){
-            try{
-                uRepository.updatePwdByPhone(phone,newPwd);
-            }catch (Exception e){
+        if (mbData.getAnswer1().equals(mbTable.getAnswer1())
+                || mbData.getAnswer2().equals(mbTable.getAnswer2())) {
+            try {
+                uRepository.updatePwdByPhone(phone, newPwd);
+            } catch (Exception e) {
                 return "fg_e";
             }
             return "fg_1";
-        }else{
+        } else {
             return "fg_0";
         }
+    }
+
+    //返回fg_e说明更新操作出问题（数据库部分），fg_1说明更新成功，fg_0说明密保答案错误。(不存在密保)
+    @Override
+    public String updateForgetPwd(userData uData) {
+        String phone = uData.getPhone();
+        String newPwd = uData.getPwd();
+        try {
+            uRepository.updatePwdByPhone(phone, newPwd);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fg_e";
+        }
+        return "fg_1";
+
     }
 }

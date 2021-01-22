@@ -116,10 +116,17 @@ public class UserController {
         }
         return "0";
     }
+    //有密保的更新密码
     @RequestMapping("/updateForgetPwd")
     @ResponseBody
     public String updateForgetPwd(@RequestBody mibaoData mbData){
         return uService.updateForgetPwd(mbData);
+    }
+    //没有密保的更新密码
+    @RequestMapping("/updateForgetPwd2")
+    @ResponseBody
+    public String updateForgetPwd(@RequestBody userData uData){
+        return uService.updateForgetPwd(uData);
     }
 
 }

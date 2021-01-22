@@ -14,4 +14,5 @@ public interface userService {
     String insertMibao(mibaoData mibao);
     String mibaoQuestion(mibaoData mibao);
     String updateForgetPwd(mibaoData mbData);
+    String updateForgetPwd(userData uData);
 }
