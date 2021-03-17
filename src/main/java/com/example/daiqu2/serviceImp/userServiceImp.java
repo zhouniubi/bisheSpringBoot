@@ -41,7 +41,6 @@ public class userServiceImp implements userService {
     @Override
     public boolean userExit(userData user) {
         userTable uTable = uRepository.findByPhone(user.getPhone());
-
         if (uTable == null) {
             return false;
         }
