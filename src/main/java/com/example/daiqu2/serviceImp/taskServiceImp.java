@@ -114,10 +114,10 @@ public class taskServiceImp implements taskService {
                 taskName.setTitle(taskTable.getTitle());
                 taskName.setType(taskTable.getType());
                 taskName.setPublisherName(uRepository.findByPhone(taskTable.getPublisherPhone()).getName());
-                if (null == uRepository.findByPhone(taskTable.getAccepterPhone())) {
-                    taskName.setAccpterName("null");
+                if (taskTable.getAccepterPhone().equals("null")) {
+                    taskName.setAccepterName("null");
                 } else {
-                    taskName.setAccpterName(uRepository.findByPhone(taskTable.getAccepterPhone()).getName());
+                    taskName.setAccepterName(uRepository.findByPhone(taskTable.getAccepterPhone()).getName());
                 }
                 list1.add(taskName);
             }

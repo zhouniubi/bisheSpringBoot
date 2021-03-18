@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 public class taskDataWithName {
     private String publisherName;
-    private String accpterName;
+    private String accepterName;
     private Integer id;
     private String taskCode;
     private String publisherPhone;
