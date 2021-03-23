@@ -180,11 +180,23 @@ public class taskServiceImp implements taskService {
         tkRepository.updateStateByCode(data.getTaskCode(),data.getState());
         return "1";
     }
+
+    @Override
+    public String updateStateAndNameByCode(taskData data) {
+        String state = "01";
+        Date d = new Date();
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String js_time = sdf2.format(d);
+        tkRepository.updateStateAndNameByCode(data.getTaskCode(),state,js_time,data.getAccepterPhone());
+        return "1";
+    }
+
     public List<taskDataWithName> findTaskByState(taskData data){
         List<taskTable> list = tkRepository.findAllByState(data.getState());
         List<taskDataWithName> list1 = new ArrayList<>();
         if(list==null||list.size()==0){
-            return null;
+            list1.add(new taskDataWithName());
+            return list1;
         }else{
             for (taskTable taskTable:list){
                 taskDataWithName taskName = new taskDataWithName();
@@ -211,6 +223,7 @@ public class taskServiceImp implements taskService {
                 }
                 list1.add(taskName);
             }
+            Collections.reverse(list1);
             return list1;
         }
     }

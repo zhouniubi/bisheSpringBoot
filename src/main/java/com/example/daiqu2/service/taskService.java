@@ -18,6 +18,8 @@ public interface taskService {
     String deleteTaskByCode(taskData data);
     //通过任务码更新任务的状态
     String updateStateByCode(taskData data);
+    //通过任务码更新任务的状态与任务的名称
+    String updateStateAndNameByCode(taskData data);
     //通过状态查询任务
     List<taskDataWithName> findTaskByState(taskData data);
 }

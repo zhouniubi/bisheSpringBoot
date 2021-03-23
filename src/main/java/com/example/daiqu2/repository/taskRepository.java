@@ -22,5 +22,11 @@ public interface taskRepository extends JpaRepository<taskTable,Integer> {
     @Modifying
     @Query(value="update task_table tk set tk.state = ?2 where tk.task_code= ?1",nativeQuery = true)
     void updateStateByCode(String code,String state);
+    //根据任务码更新任务状态
+    @Transactional
+    @Modifying
+    @Query(value="update task_table tk set tk.state = ?2 , " +
+            "tk.js_time = ?3 , tk.accepter_phone = ?4 where tk.task_code= ?1",nativeQuery = true)
+    void updateStateAndNameByCode(String code,String state,String date,String phone);
 
 }

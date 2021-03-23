@@ -60,8 +60,6 @@ public class taskController {
     @ResponseBody
     public byte[] loadPic(MultipartFile file, taskData data){
         byte[] dataByte = SendPic.sendPic(data.getPic());
-        /*System.out.println("pic是："+data.getPic());
-        System.out.println("dataByte是："+dataByte);*/
         return dataByte;
     }
     //更新任务信息数据
@@ -83,4 +81,10 @@ public class taskController {
     public String updateState(@RequestBody taskData data){
         return tkService.updateStateByCode(data);
     }
+    @RequestMapping("/updateState2")
+    @ResponseBody
+    public String updateStateWithAccepterName(@RequestBody taskData data){
+        return tkService.updateStateAndNameByCode(data);
+    }
+
 }
