@@ -4,6 +4,7 @@ import com.example.daiqu2.data.taskData;
 import com.example.daiqu2.data.taskDataWithName;
 import com.example.daiqu2.entity.taskTable;
 import com.example.daiqu2.service.taskService;
+import com.example.daiqu2.tool.SendPic;
 import com.example.daiqu2.tool.postPicture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,5 +49,38 @@ public class taskController {
     public List<taskDataWithName> findTaskWithName(@RequestBody taskData data){
         return tkService.findTaskWithNameByPublisherPhone(data.getPublisherPhone());
     }
-
+    //查询没有接单的任务伴随名字返回
+    @RequestMapping("/findTaskByState")
+    @ResponseBody
+    public List<taskDataWithName> findTaskByState(@RequestBody taskData data){
+        return tkService.findTaskByState(data);
+    }
+    //加载任务图片
+    @RequestMapping("/loadPic")
+    @ResponseBody
+    public byte[] loadPic(MultipartFile file, taskData data){
+        byte[] dataByte = SendPic.sendPic(data.getPic());
+        /*System.out.println("pic是："+data.getPic());
+        System.out.println("dataByte是："+dataByte);*/
+        return dataByte;
+    }
+    //更新任务信息数据
+    @RequestMapping("/updateTask")
+    @ResponseBody
+    public String updateTask(MultipartFile file, taskData data){
+        String state = tkService.updateTaskByCode(data,file);
+        return state;
+    }
+    //删除指定任务码的任务
+    @RequestMapping("/deleteTask")
+    @ResponseBody
+    public String deleteTask(@RequestBody taskData data){
+        return tkService.deleteTaskByCode(data);
+    }
+    //更新任务的状态
+    @RequestMapping("/updateState1")
+    @ResponseBody
+    public String updateState(@RequestBody taskData data){
+        return tkService.updateStateByCode(data);
+    }
 }

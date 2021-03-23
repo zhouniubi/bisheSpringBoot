@@ -40,7 +40,6 @@ public class taskServiceImp implements taskService {
         String time = sdf2.format(d);
         if (file != null) {
             //图片上传异常
-            // boolean pic_state = postPicture.upLoad(file);
             if (!post.upLoad(file)) {
                 return "01";
             } else {
@@ -124,5 +123,95 @@ public class taskServiceImp implements taskService {
         }
         Collections.reverse(list1);
         return list1;
+    }
+
+    @Override
+    public String findPicByCode(String code) {
+        String pic_name = tkRepository.findByTaskCode(code).getPic();
+        if (pic_name.equals("")) {
+            return "00";
+        } else {
+            return pic_name;
+        }
+    }
+
+    @Override
+    public String updateTaskByCode(taskData data, MultipartFile file) {
+        taskTable table = new taskTable();
+        String pic_name ="";
+        postPicture post = new postPicture();
+        table.setId(Integer.valueOf(data.getId()));
+        table.setTitle(data.getTitle());
+        table.setNeedTime(data.getNeedTime());
+        table.setMoney(data.getMoney());
+        table.setGetPlace(data.getGetPlace());
+        table.setPostPlace(data.getPostPlace());
+        table.setInfomation(data.getInfomation());
+        table.setTaskCode(data.getTaskCode());
+        table.setPublisherPhone(data.getPublisherPhone());
+        table.setAccepterPhone(data.getAccepterPhone());
+        table.setTime(data.getTime());
+        table.setTime2(data.getTime2());
+        table.setType(data.getType());
+        table.setState(data.getState());
+        if (file != null) {
+            //图片上传
+            if (post.upLoad(file)) {
+                pic_name = post.file_name;
+            }
+        }else{
+            if(!data.getPic().equals("")){
+                pic_name = data.getPic();
+            }
+        }
+        table.setPic(pic_name);
+        tkRepository.save(table);
+        return "11";
+    }
+
+    @Override
+    public String deleteTaskByCode(taskData data) {
+        tkRepository.deleteByTaskCode(data.getTaskCode());
+        return "1";
+    }
+
+    @Override
+    public String updateStateByCode(taskData data) {
+        tkRepository.updateStateByCode(data.getTaskCode(),data.getState());
+        return "1";
+    }
+    public List<taskDataWithName> findTaskByState(taskData data){
+        List<taskTable> list = tkRepository.findAllByState(data.getState());
+        List<taskDataWithName> list1 = new ArrayList<>();
+        if(list==null||list.size()==0){
+            return null;
+        }else{
+            for (taskTable taskTable:list){
+                taskDataWithName taskName = new taskDataWithName();
+                taskName.setId(taskTable.getId());
+                taskName.setAccepterPhone(taskTable.getAccepterPhone());
+                taskName.setGetPlace(taskTable.getGetPlace());
+                taskName.setInfomation(taskTable.getInfomation());
+                taskName.setMoney(taskTable.getMoney());
+                taskName.setNeedTime(taskTable.getNeedTime());
+                taskName.setPic(taskTable.getPic());
+                taskName.setPostPlace(taskTable.getPostPlace());
+                taskName.setState(taskTable.getState());
+                taskName.setTaskCode(taskTable.getTaskCode());
+                taskName.setPublisherPhone(taskTable.getPublisherPhone());
+                taskName.setTime(taskTable.getTime());
+                taskName.setTime2(taskTable.getTime2());
+                taskName.setTitle(taskTable.getTitle());
+                taskName.setType(taskTable.getType());
+                taskName.setPublisherName(uRepository.findByPhone(taskTable.getPublisherPhone()).getName());
+                if (taskTable.getAccepterPhone().equals("null")) {
+                    taskName.setAccepterName("null");
+                } else {
+                    taskName.setAccepterName(uRepository.findByPhone(taskTable.getAccepterPhone()).getName());
+                }
+                list1.add(taskName);
+            }
+            return list1;
+        }
     }
 }
