@@ -12,7 +12,6 @@ public class SendPic {
             FileInputStream inputStream = new FileInputStream(file);
             byte[] bytes = new byte[inputStream.available()];
             inputStream.read(bytes,0,inputStream.available());
-            System.out.println(bytes);
             return bytes;
         }catch (Exception e){
             e.printStackTrace();

@@ -13,10 +13,13 @@ public interface taskRepository extends JpaRepository<taskTable,Integer> {
     taskTable findByTaskCode(String code);
     //通过发布者手机号查询发布的任务
     List<taskTable> findAllByPublisherPhone(String phone);
-    //通过任务码删除相关的课程
+    //通过任务码删除相关的任务
     void deleteByTaskCode(String code);
     //查询所有未接单的任务
     List<taskTable> findAllByState(String state);
+    //查询所有已经接单的任务（特定用户）
+    List<taskTable> findAllByStateAndAccepterPhone(String state,String phone);
+
     //根据任务码更新任务状态
     @Transactional
     @Modifying

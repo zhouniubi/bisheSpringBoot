@@ -14,7 +14,7 @@ public interface taskService {
     String findPicByCode(String code);
     //通过任务码更新任务
     String updateTaskByCode(taskData data,MultipartFile file);
-    //通过任务码删除课程
+    //通过任务码删除任务
     String deleteTaskByCode(taskData data);
     //通过任务码更新任务的状态
     String updateStateByCode(taskData data);
@@ -22,4 +22,7 @@ public interface taskService {
     String updateStateAndNameByCode(taskData data);
     //通过状态查询任务
     List<taskDataWithName> findTaskByState(taskData data);
+    //通过状态与手机号查询任务
+    List<taskDataWithName> findTaskByStateAndAceepter(taskData data);
+
 }

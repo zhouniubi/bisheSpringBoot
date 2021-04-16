@@ -23,7 +23,7 @@ public class taskController {
     @RequestMapping("/testUploadPic")
     @ResponseBody
     public String testUploadPic(@RequestBody MultipartFile file){
-        System.out.print("test");
+
         postPicture post = new postPicture();
         if(post.upLoad(file)){
             return "1";
@@ -55,6 +55,12 @@ public class taskController {
     public List<taskDataWithName> findTaskByState(@RequestBody taskData data){
         return tkService.findTaskByState(data);
     }
+    //查询没有接单的任务伴随名字返回
+    @RequestMapping("/findTaskByStateAndPhone")
+    @ResponseBody
+    public List<taskDataWithName> findTaskByStateAndPhone(@RequestBody taskData data){
+        return tkService.findTaskByStateAndAceepter(data);
+    }
     //加载任务图片
     @RequestMapping("/loadPic")
     @ResponseBody
@@ -76,11 +82,13 @@ public class taskController {
         return tkService.deleteTaskByCode(data);
     }
     //更新任务的状态
+    /*注意，此接口仅作用于用户或者派送员确认收货，没有相关的派送时间的设置，updateState2中含有相关的全部设置*/
     @RequestMapping("/updateState1")
     @ResponseBody
     public String updateState(@RequestBody taskData data){
         return tkService.updateStateByCode(data);
     }
+    /*注意，此接口含有时间相关的设置，作用于派送员接单*/
     @RequestMapping("/updateState2")
     @ResponseBody
     public String updateStateWithAccepterName(@RequestBody taskData data){
