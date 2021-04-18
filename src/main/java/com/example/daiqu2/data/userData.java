@@ -11,6 +11,7 @@ public class userData {
     private String introduce;
     private String name;
     private String pwd;
+    private String pic;
     /*private String mibao1;
     private String mibao2;*/
 

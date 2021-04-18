@@ -128,6 +128,13 @@ public class UserController {
     public String updateForgetPwd(@RequestBody userData uData){
         return uService.updateForgetPwd(uData);
     }
-
+    //查询用户信息
+    @RequestMapping("/findUserInformation")
+    @ResponseBody
+    public userTable findUserByPhone(@RequestBody userData uData){
+        System.out.println(uData.getPhone());
+        System.out.println(uService.findUserByPhone(uData).toString());
+        return uService.findUserByPhone(uData);
+    }
 
 }

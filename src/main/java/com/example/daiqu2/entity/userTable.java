@@ -22,6 +22,8 @@ public class userTable {
     private String identity;
     @Column(name = "introduce")
     private String introduce;
+    @Column(name = "pic")
+    private String pic;
 
 
 

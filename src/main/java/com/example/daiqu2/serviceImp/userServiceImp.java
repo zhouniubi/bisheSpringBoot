@@ -33,6 +33,7 @@ public class userServiceImp implements userService {
         uTable.setIntroduce(user.getIntroduce());
         uTable.setPwd(user.getPwd());
         uTable.setSex(user.getSex());
+        uTable.setPic("000");
         uRepository.save(uTable);
         return 1;
     }
@@ -94,16 +95,19 @@ public class userServiceImp implements userService {
             return "000";
         } else {
             mibaoTable mbTable = mbRepository.findByPhone(mbData.getPhone());
+            if(null == mbTable){
+                return "200";
+            }
             String mibao1 = mbTable.getMibao1();
             String mibao2 = mbTable.getMibao2();
-            if (mibao1 == null || mibao1.length() == 0) {
-                if (mibao2 == null || mibao2.length() == 0) {
+            if (null == mibao1 || mibao1.length() == 0) {
+                if (null == mibao2 || mibao2.length() == 0) {
                     return "200";
                 } else {
                     return "202";
                 }
             } else {
-                if (mibao2 == null || mibao2.length() == 0) {
+                if (null == mibao2 || mibao2.length() == 0) {
                     return "220";
                 } else {
                     return "222";
@@ -176,5 +180,11 @@ public class userServiceImp implements userService {
         }
         return "fg_1";
 
+    }
+
+    @Override
+    public userTable findUserByPhone(userData user) {
+
+        return uRepository.findByPhone(user.getPhone());
     }
 }
