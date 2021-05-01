@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,5 +135,10 @@ public class UserController {
         System.out.println(uService.findUserByPhone(uData).toString());
         return uService.findUserByPhone(uData);
     }
-
+    //更新用户信息
+    @RequestMapping("/updateUserInformation")
+    @ResponseBody
+    public String updateUserInformation(@RequestBody userData uData){
+        return uService.updateUser(uData);
+    }
 }

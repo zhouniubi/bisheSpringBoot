@@ -1,5 +1,4 @@
 package com.example.daiqu2.serviceImp;
-
 import com.example.daiqu2.data.mibaoData;
 import com.example.daiqu2.data.userData;
 import com.example.daiqu2.entity.mibaoTable;
@@ -30,9 +29,10 @@ public class userServiceImp implements userService {
         uTable.setIdentity(user.getIdentity());
         uTable.setName(user.getName());
         uTable.setPhone(user.getPhone());
-        uTable.setIntroduce(user.getIntroduce());
+        uTable.setIntroduce("null");
         uTable.setPwd(user.getPwd());
         uTable.setSex(user.getSex());
+        //默认初始头像为“000”
         uTable.setPic("000");
         uRepository.save(uTable);
         return 1;
@@ -186,5 +186,17 @@ public class userServiceImp implements userService {
     public userTable findUserByPhone(userData user) {
 
         return uRepository.findByPhone(user.getPhone());
+    }
+
+    @Override
+    public String updateUser(userData uData) {
+        try {
+            uRepository.updateUserByPhone(uData.getPhone(), uData.getName(),
+                    uData.getSex(), uData.getIdentity(), uData.getPic(), uData.getIntroduce());
+        }catch (Exception e){
+            e.printStackTrace();
+            return "db_error";
+        }
+        return "11";
     }
 }
