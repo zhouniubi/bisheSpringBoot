@@ -1,4 +1,5 @@
 package com.example.daiqu2.serviceImp;
+
 import com.example.daiqu2.data.mibaoData;
 import com.example.daiqu2.data.userData;
 import com.example.daiqu2.entity.mibaoTable;
@@ -7,9 +8,13 @@ import com.example.daiqu2.repository.mibaoRepository;
 import com.example.daiqu2.repository.userRepository;
 import com.example.daiqu2.service.userService;
 import com.example.daiqu2.tool.AES;
+import com.example.daiqu2.tool.returnState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -21,10 +26,10 @@ public class userServiceImp implements userService {
 
     //插入新的用户数据（注册使用）
     @Override
-    public int insertUser(userData user) {
+    public String insertUser(userData user) {
         userTable uTable = new userTable();
         if (userExit(user)) {
-            return 0;
+            return returnState.insert_fail;
         }
         uTable.setIdentity(user.getIdentity());
         uTable.setName(user.getName());
@@ -35,7 +40,7 @@ public class userServiceImp implements userService {
         //默认初始头像为“000”
         uTable.setPic("000");
         uRepository.save(uTable);
-        return 1;
+        return returnState.insert_success;
     }
 
     //判断用户是否已经存在
@@ -62,20 +67,55 @@ public class userServiceImp implements userService {
     public String loginUser(userData user) {
         try {
             if (!userExit(user)) {
-                //System.out.println("用户不存在");
-                return "000";
+                return returnState.user_not_exit;
             }
             userTable uTable = uRepository.findByPhoneAndPwd(user.getPhone(), user.getPwd());
             if (uTable == null) {
-                // System.out.println("密码错误");
-                return "110";
+                return returnState.error_pwd;
             } else {
-                //System.out.println("登陆成功");
-                return "111";
+                return returnState.load_success;
             }
         } catch (Exception e) {
-            //System.out.println("其他错误");
-            return "101";
+            return returnState.error_special;
+        }
+    }
+    public String loadUser(userData user){
+        switch(loginUser(user)){
+            case returnState.load_success:
+                return returnState.load_success;//"登录成功"
+            case returnState.error_pwd:
+                return returnState.error_pwd;//"密码错误"
+            case returnState.user_not_exit:
+                return returnState.user_not_exit;//"用户不存在";
+            default:
+                return returnState.error_special;
+        }
+    }
+
+    @Override
+    public List<String> mibaoExitList(mibaoData mbData) {
+        List<String> list = new ArrayList<>();
+        switch (mibaoExit(mbData)) {
+            case returnState.user_not_exit:
+                list.add(returnState.user_not_exit);
+                list.add("##");
+                return list;//用户不存在
+            case returnState.mibao_not_exit:
+                list.add(returnState.mibao_not_exit);
+                list.add("#");
+                return list;//密保不存在
+            case returnState.mibao2_not_exit:
+                list.add(returnState.mibao2_not_exit);
+                list.add(mibaoQuestion(mbData));
+                return list;//密保2不存在
+            case returnState.mibao1_not_exit:
+                list.add(returnState.mibao1_not_exit);
+                list.add(mibaoQuestion(mbData));
+                return list;//密保1不存在
+            default:
+                list.add(returnState.mibao_exit);
+                list.add(mibaoQuestion(mbData));
+                return list;//密保存在
         }
     }
 
@@ -92,25 +132,25 @@ public class userServiceImp implements userService {
         userData uData = new userData();
         uData.setPhone(mbData.getPhone());
         if (!userExit(uData)) {
-            return "000";
+            return returnState.user_not_exit;
         } else {
             mibaoTable mbTable = mbRepository.findByPhone(mbData.getPhone());
-            if(null == mbTable){
-                return "200";
+            if (null == mbTable) {
+                return returnState.mibao_not_exit;
             }
             String mibao1 = mbTable.getMibao1();
             String mibao2 = mbTable.getMibao2();
             if (null == mibao1 || mibao1.length() == 0) {
                 if (null == mibao2 || mibao2.length() == 0) {
-                    return "200";
+                    return returnState.mibao_not_exit;
                 } else {
-                    return "202";
+                    return returnState.mibao1_not_exit;
                 }
             } else {
                 if (null == mibao2 || mibao2.length() == 0) {
-                    return "220";
+                    return returnState.mibao2_not_exit;
                 } else {
-                    return "222";
+                    return returnState.mibao_exit;
                 }
             }
 
@@ -120,18 +160,45 @@ public class userServiceImp implements userService {
     @Override
     public String insertMibao(mibaoData mbData) {
         mibaoTable mbTable = new mibaoTable();
-        try {
-            mbTable.setPhone(mbData.getPhone());
-            mbTable.setMibao1(mbData.getMibao1());
-            mbTable.setAnswer1(mbData.getAnswer1());
-            mbTable.setMibao2(mbData.getMibao2());
-            mbTable.setAnswer2(mbData.getAnswer2());
+        mbTable.setPhone(mbData.getPhone());
+        if(mibaoExit(mbData).equals(returnState.mibao_not_exit)){
+            if ("".equals(mbTable.getMibao1()) && !"".equals(mbTable.getMibao2())) {
+                mbTable.setMibao1(null);
+                mbTable.setAnswer1(null);
+                mbTable.setMibao2(mbData.getMibao2());
+                mbTable.setAnswer2(mbData.getAnswer2());
+            } else if (!"".equals(mbTable.getMibao1()) && "".equals(mbTable.getMibao2())) {
+                mbTable.setMibao1(mbData.getMibao1());
+                mbTable.setAnswer1(mbData.getAnswer1());
+                mbTable.setMibao2(null);
+                mbTable.setAnswer2(null);
+            } else {
+                mbTable.setMibao1(mbData.getMibao1());
+                mbTable.setAnswer1(mbData.getAnswer1());
+                mbTable.setMibao2(mbData.getMibao2());
+                mbTable.setAnswer2(mbData.getAnswer2());
+            }
             mbRepository.save(mbTable);
-            return "1";
-        } catch (Exception e) {
-            e.printStackTrace();
+        }else{
+            if ("".equals(mbTable.getMibao1()) && !"".equals(mbTable.getMibao2())) {
+                mbTable.setMibao1(null);
+                mbTable.setAnswer1(null);
+                mbTable.setMibao2(mbData.getMibao2());
+                mbTable.setAnswer2(mbData.getAnswer2());
+            } else if (!"".equals(mbTable.getMibao1()) && "".equals(mbTable.getMibao2())) {
+                mbTable.setMibao1(mbData.getMibao1());
+                mbTable.setAnswer1(mbData.getAnswer1());
+                mbTable.setMibao2(null);
+                mbTable.setAnswer2(null);
+            } else {
+                mbTable.setMibao1(mbData.getMibao1());
+                mbTable.setAnswer1(mbData.getAnswer1());
+                mbTable.setMibao2(mbData.getMibao2());
+                mbTable.setAnswer2(mbData.getAnswer2());
+            }
+            mbRepository.updateMibao(mbTable.getMibao1(),mbTable.getAnswer1(),mbTable.getMibao2(),mbTable.getAnswer2(),mbTable.getPhone());
         }
-        return "0";
+        return "1";
     }
 
     @Override
@@ -139,12 +206,38 @@ public class userServiceImp implements userService {
         String state = mibaoExit(mbData);
         String phone = mbData.getPhone();
         mibaoTable mbTable = mbRepository.findByPhone(phone);
-        if (state.equals("220")) {
+        if (state.equals(returnState.mibao2_not_exit)) {
             return mbTable.getMibao1();
-        } else if (state.equals("202")) {
+        } else if (state.equals(returnState.mibao1_not_exit)) {
             return mbTable.getMibao2();
         } else {
             return mbTable.getMibao1() + "/" + mbTable.getMibao2();
+        }
+    }
+
+    @Override
+    public mibaoTable findMibao(mibaoData mibao) {
+        String state = mibaoExit(mibao);
+        mibaoTable mbTable = new mibaoTable();
+        switch (state) {
+            case returnState.mibao_not_exit:
+                mbTable.setMibao1("null");
+                mbTable.setAnswer1("null");
+                mbTable.setMibao2("null");
+                mbTable.setAnswer2("null");
+                return mbTable;
+            case returnState.mibao2_not_exit:
+                mbTable = mbRepository.findByPhone(mibao.getPhone());
+                mbTable.setMibao2("null");
+                mbTable.setAnswer2("null");
+                return mbTable;
+            case returnState.mibao1_not_exit:
+                mbTable = mbRepository.findByPhone(mibao.getPhone());
+                mbTable.setMibao1("null");
+                mbTable.setAnswer1("null");
+                return mbTable;
+            default:
+                return mbRepository.findByPhone(mibao.getPhone());
         }
     }
 
@@ -193,10 +286,11 @@ public class userServiceImp implements userService {
         try {
             uRepository.updateUserByPhone(uData.getPhone(), uData.getName(),
                     uData.getSex(), uData.getIdentity(), uData.getPic(), uData.getIntroduce());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return "db_error";
         }
         return "11";
     }
+
 }

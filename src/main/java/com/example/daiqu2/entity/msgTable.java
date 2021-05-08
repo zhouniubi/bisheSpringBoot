@@ -3,7 +3,6 @@ package com.example.daiqu2.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-
 @Entity
 @Table(name = "msg_table")
 @Data
